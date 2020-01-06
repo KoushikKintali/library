@@ -1,21 +1,26 @@
 const express = require("express");
-const chalk = require("chalk");
-const debug = require("debug")("app");
-const morgan = require("morgan");
-const path = require("path");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 
 const app = express();
 
-// app.use(morgan("combined"));
-app.use(morgan("tiny"));
+const db = mongoose.connect("mongodb://localhost/bookAPI");
+
+const port = process.env.PORT || 3000;
+
+const Book = require("./models/bookModel");
+
+const bookRouter = require("./routes/bookRouter")(Book);
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+app.use("/api", bookRouter);
 
 app.get("/", function(req, res) {
-  //   res.send("Hello from my library app
-  //   res.sendFile(__dirname + "/views/index.html");
-  res.sendFile(path.join(__dirname, "/views/index.html"));
+  res.send("Hello from my library app");
 });
 
-app.listen(3000, () => {
-  console.log(`Server Started at ${chalk.green("3000")}`);
-  //   debug(`Server Started at ${chalk.green("3000")}`);
+app.listen(port, () => {
+  console.log(`Server Started at ${port}`);
 });
